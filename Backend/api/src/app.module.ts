@@ -5,6 +5,8 @@ import { DatabaseModule } from './config/database.module';
 import { ProductosModule } from './modules/productos/productos.module';
 import { TokenGuard } from './guards/token.guard';
 import { ComprasModule } from './modules/compras/compras.module';
+import { VentasModule } from './modules/ventas/ventas.module';
+import { ReportesModule } from './modules/reportes/reportes.module';
 
 @Module({
   imports: [
@@ -12,6 +14,8 @@ import { ComprasModule } from './modules/compras/compras.module';
     DatabaseModule,
     ProductosModule,
     ComprasModule,
+    VentasModule,
+    ReportesModule,
   ],
   providers: [
     {

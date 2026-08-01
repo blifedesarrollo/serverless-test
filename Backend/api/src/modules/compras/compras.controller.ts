@@ -1,8 +1,14 @@
-import { Body, Controller, Post } from '@nestjs/common';
-import { ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {Body,Controller,Get,Param,ParseUUIDPipe,Post,Query,} from '@nestjs/common';
+import {ApiHeader,ApiOkResponse,ApiOperation,ApiTags,} from '@nestjs/swagger';
 import { RequiereToken } from 'src/decorators/token.decorator';
 import { ComprasCoordinator } from './compras.coordinator';
-import { CrearCompraDTO } from './dto/compras.dto';
+import { ComprasService } from './compras.service';
+import {
+  CompraDetalleResponseDTO,
+  ComprasListaResponseDTO,
+  CrearCompraDTO,
+  FiltrosComprasDTO,
+} from './dto/compras.dto';
 
 @ApiTags('Compras')
 @ApiHeader({
@@ -12,7 +18,32 @@ import { CrearCompraDTO } from './dto/compras.dto';
 })
 @Controller('compras')
 export class ComprasController {
-  constructor(private readonly coordinator: ComprasCoordinator) {}
+  constructor(
+    private readonly coordinator: ComprasCoordinator,
+    private readonly service: ComprasService,
+  ) {}
+
+  @Get()
+  @RequiereToken()
+  @ApiOperation({ summary: 'Obtener lista de compras' })
+  @ApiOkResponse({ type: ComprasListaResponseDTO })
+  async obtenerCompras(
+    @Query() filtros: FiltrosComprasDTO,
+  ): Promise<ComprasListaResponseDTO> {
+    const empresa = await this.service.obtenerEmpresaActiva();
+    return await this.service.obtenerCompras(filtros, empresa.empresa_id);
+  }
+
+  @Get(':uuid')
+  @RequiereToken()
+  @ApiOperation({ summary: 'Obtener una compra por UUID con sus partidas' })
+  @ApiOkResponse({ type: CompraDetalleResponseDTO })
+  async obtenerCompraPorUUID(
+    @Param('uuid', ParseUUIDPipe) uuid: string,
+  ): Promise<CompraDetalleResponseDTO> {
+    const empresa = await this.service.obtenerEmpresaActiva();
+    return await this.service.obtenerCompraPorUUID(uuid, empresa.empresa_id);
+  }
 
   @Post()
   @RequiereToken()

@@ -1,6 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ComprasRepoAction } from './repositories/compras.repoAction';
 import { ComprasRepoData } from './repositories/compras.repoData';
+import { FiltrosComprasDTO } from './dto/compras.dto';
+
 @Injectable()
 export class ComprasService {
   constructor(
@@ -24,5 +26,19 @@ export class ComprasService {
 
   async crearCompraCompleta(compraObj: any, partidas: any[]) {
     return await this.repoAction.crearCompraCompleta(compraObj, partidas);
+  }
+
+  async obtenerCompras(filtros: FiltrosComprasDTO, empresaId: number) {
+    return await this.repoData.obtenerCompras(filtros, empresaId);
+  }
+
+  async obtenerCompraPorUUID(uuid: string, empresaId: number) {
+    const compra = await this.repoData.obtenerCompraPorUUID(uuid, empresaId);
+
+    if (!compra) {
+      throw new NotFoundException('Compra no encontrada');
+    }
+
+    return compra;
   }
 }

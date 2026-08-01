@@ -1,0 +1,54 @@
+service: serverless-test-api
+
+frameworkVersion: '^3.0.0'
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: us-east-1
+  stage: local
+  timeout: 29
+  memorySize: 512
+  environment:
+    NODE_ENV: ${env:NODE_ENV, 'development'}
+    HOST: ${env:HOST, '0.0.0.0'}
+    PORT: ${env:PORT, '3000'}
+    DB_HOST: ${env:DB_HOST, '127.0.0.1'}
+    DB_PORT: ${env:DB_PORT, '5432'}
+    DB_USER: ${env:DB_USER, 'postgres'}
+    DB_PASSWORD: ${env:DB_PASSWORD, 'postgres'}
+    DB_DATABASE: ${env:DB_DATABASE, 'prueba_tecnica'}
+    API_TOKEN: ${env:API_TOKEN, 'token_local'}
+
+functions:
+  api:
+    handler: dist/src/lambda.handler
+    events:
+      - http:
+          method: ANY
+          path: /
+      - http:
+          method: ANY
+          path: /{proxy+}
+
+plugins:
+  - serverless-offline
+
+custom:
+  serverless-offline:
+    httpPort: 3001
+    lambdaPort: 3002
+    noPrependStageInUrl: true
+
+package:
+  patterns:
+    - dist/**
+    - node_modules/**
+    - package.json
+    - '!src/**'
+    - '!test/**'
+    - '!coverage/**'
+    - '!*.log'
+    - '!.git/**'
+    - '!.serverless/**'

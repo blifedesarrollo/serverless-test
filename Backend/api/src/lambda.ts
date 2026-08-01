@@ -1,15 +1,16 @@
+import { Callback, Context, Handler } from 'aws-lambda';
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import serverlessExpress from '@vendia/serverless-express';
 import { AppModule } from './app.module';
 
-async function bootstrap() {
+let cachedServer: Handler;
+
+async function bootstrap(): Promise<Handler> {
   const app = await NestFactory.create(AppModule);
   const config = app.get(ConfigService);
-
-  const port = config.get<number>('PORT', 3000);
-  const host = config.get<string>('HOST', '0.0.0.0');
 
   app.setGlobalPrefix('api/v1');
   app.enableCors();
@@ -34,8 +35,17 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('docs', app, document);
 
-  await app.listen(port, host);
-  console.log(`API en http://${host}:${port}/api/v1 | Docs en http://${host}:${port}/docs`);
+  await app.init();
+
+  const expressApp = app.getHttpAdapter().getInstance();
+  return serverlessExpress({ app: expressApp });
 }
 
-bootstrap();
+export const handler: Handler = async (
+  event: any,
+  context: Context,
+  callback: Callback,
+) => {
+  cachedServer = cachedServer ?? (await bootstrap());
+  return cachedServer(event, context, callback);
+};

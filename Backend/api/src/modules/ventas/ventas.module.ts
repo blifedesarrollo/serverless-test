@@ -5,6 +5,7 @@ import { VentasService } from './ventas.service';
 import { VentasBO } from './repositories/ventas.bo';
 import { VentasRepoAction } from './repositories/ventas.repoAction';
 import { VentasRepoData } from './repositories/ventas.repoData';
+import { VentasRepoHelper } from './repositories/ventas.repoHelper';
 
 @Module({
   controllers: [VentasController],
@@ -12,8 +13,9 @@ import { VentasRepoData } from './repositories/ventas.repoData';
     VentasCoordinator,
     VentasService,
     VentasBO,
-    VentasRepoData,
     VentasRepoAction,
+    VentasRepoData,
+    VentasRepoHelper,
   ],
 })
 export class VentasModule {}

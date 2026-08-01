@@ -30,4 +30,18 @@ export class VentasService {
   async crearVentaCompleta(ventaObj: any, partidas: any[]) {
     return await this.repoAction.crearVentaCompleta(ventaObj, partidas);
   }
+
+    async obtenerVentas(filtros: any, empresaId: number) {
+    return await this.repoData.obtenerVentas(filtros, empresaId);
+  }
+
+  async obtenerVentaPorUUID(uuid: string, empresaId: number) {
+    const venta = await this.repoData.obtenerVentaPorUUID(uuid, empresaId);
+
+    if (!venta) {
+      throw new NotFoundException('Venta no encontrada');
+    }
+
+    return venta;
+  }
 }
